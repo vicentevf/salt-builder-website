@@ -144,13 +144,13 @@ nav a:not(.btn){display:none}
 .bg.n{background:var(--scrim),var(--hero-img-night) 45% center/cover no-repeat;opacity:calc(var(--po,1)*var(--nt,0))}
 .front.n{background:var(--scrim),var(--hero-img-night) 45% center/cover no-repeat;-webkit-mask:var(--hero-mask-night) 45% center/cover no-repeat;mask:var(--hero-mask-night) 45% center/cover no-repeat;opacity:calc(var(--po,1)*var(--nt,0))}
 .phrase.back{color:color-mix(in srgb,#fff calc(var(--nt,0)*100%),#12212A)}
-.tod{position:absolute;right:max(24px,calc((100% - 1180px)/2 + 24px));bottom:54px;z-index:3;display:flex;align-items:center;width:84px;height:42px;padding:0;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(18,33,42,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:pointer;color:#fff;opacity:var(--tg,1)}
-.tod::before{content:"";position:absolute;top:3px;left:3px;width:34px;height:34px;border-radius:50%;background:#fff;transform:translateX(calc(var(--nt,0)*42px))}
-.tod svg{position:relative;width:20px;height:20px;margin:0 11px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.tod .sun{color:color-mix(in srgb,#fff calc(var(--nt,0)*100%),#12212A)}
-.tod .moon{color:color-mix(in srgb,#12212A calc(var(--nt,0)*100%),#fff)}
-.tod:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .front{opacity:calc(var(--po,1)*(1 - var(--nt,0)))}
+.tod{position:absolute;right:max(24px,calc((100% - 1180px)/2 + 24px));bottom:54px;z-index:3;display:flex;padding:3px;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(18,33,42,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:var(--tg,1)}
+.tod::before{content:"";position:absolute;top:3px;left:3px;width:68px;height:36px;border-radius:999px;background:#fff;transform:translateX(calc(var(--nt,0)*68px))}
+.tod button{position:relative;width:68px;height:36px;padding:0;border:0;border-radius:999px;background:none;font:inherit;font-weight:700;font-size:14px;letter-spacing:.02em;cursor:pointer}
+.tod .d{color:color-mix(in srgb,#12212A calc((1 - var(--nt,0))*100%),#fff)}
+.tod .n{color:color-mix(in srgb,#12212A calc(var(--nt,0)*100%),#fff)}
+.tod button:focus-visible{outline:3px solid #fff;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -180,7 +180,7 @@ nav a:not(.btn){display:none}
 <p>Salt Builders is a team of two qualified builders delivering new builds, renovations, alterations and outdoor areas, with quality and attention to detail from concept to completion.</p>
 <div class="cta"><a class="btn" href="#cform">Get in touch</a><a class="btn ghost" href="#projects">See our projects</a></div>
 </div>
-<button class="tod" type="button" role="switch" aria-checked="false" aria-label="Switch hero photo to night"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+<div class="tod" role="group" aria-label="Hero photo: day or night"><button type="button" class="d" aria-pressed="true">Day</button><button type="button" class="n" aria-pressed="false">Night</button></div>
 <div class="cue" aria-hidden="true">SCROLL</div>
 <div class="pbar" aria-hidden="true"></div>
 </div>
@@ -340,14 +340,15 @@ fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','A
 </script>
 <script>
 (function(){
-var hero=document.getElementById('hero'),b=hero&&hero.querySelector('.tod');if(!b)return;
-var on=false,nt=0,raf=0,reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+var hero=document.getElementById('hero'),box=hero&&hero.querySelector('.tod');if(!box)return;
+var bs=box.querySelectorAll('button'),to=0,nt=0,raf=0,reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 function set(v){nt=v;hero.style.setProperty('--nt',v.toFixed(4))}
 function ease(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2}
-function go(to){cancelAnimationFrame(raf);if(reduce){set(to);return}
-var from=nt,t0=performance.now(),D=1400*Math.abs(to-from)+200;
-(function step(now){var k=Math.min(1,(now-t0)/D);set(from+(to-from)*ease(k));if(k<1)raf=requestAnimationFrame(step)})(t0)}
-b.addEventListener('click',function(){on=!on;b.setAttribute('aria-checked',on?'true':'false');b.setAttribute('aria-label',on?'Switch hero photo to day':'Switch hero photo to night');go(on?1:0)});
+function go(t){cancelAnimationFrame(raf);if(reduce){set(t);return}
+var from=nt,t0=performance.now(),D=1400*Math.abs(t-from)+200;
+(function step(now){var k=Math.min(1,(now-t0)/D);set(from+(t-from)*ease(k));if(k<1)raf=requestAnimationFrame(step)})(t0)}
+box.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var t=b.classList.contains('n')?1:0;if(t===to)return;to=t;
+for(var i=0;i<bs.length;i++)bs[i].setAttribute('aria-pressed',((bs[i].classList.contains('n')?1:0)===to)?'true':'false');go(to)});
 })();
 </script>
 </body>
